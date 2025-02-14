@@ -1,0 +1,295 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-update-galaxies
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -k -X POST -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/galaxies/update'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-feeds-cache-all
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "20 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -k -X POST -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/feeds/cacheFeeds/all'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-feeds-fetch-all
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "30 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -X POST -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/feeds/fetchFromAllFeeds'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-update-taxonomies
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "10 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -X POST -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/taxonomies/update'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-update-warninglists
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "20 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -X POST -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/warninglists/update'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-update-noticelists
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "30 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - 'curl -s -X POST -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/noticelists/update'
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-pull-all-servers
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                json_data=$(curl -s -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/servers)
+                server_objects=$(echo $json_data | awk 'BEGIN{RS="},"}{print $0}' | grep '"Server"')
+                id_list=$(echo $server_objects | awk 'BEGIN{RS=","}{print $0}' | grep '"id"' | sed 's/.*: //;s/}//;s/"//g')
+                for id in $id_list
+                do
+                    echo "Pulling from server with id $id"
+                    curl -s -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/servers/pull/$id
+                done
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: misp-cron-push-all-servers
+  labels:
+    misp-project.org/component: misp-cron
+    app.kubernetes.io/name: misp-cron
+    instance: "default"
+spec:
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: misp-cron
+            misp-project.org/component: misp-cron
+        spec:
+          imagePullSecrets:
+            - name: registry-pull-secret
+          containers:
+          - name: curl
+            image: curlimages/curl:8.12.1
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                json_data=$(curl -s -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/servers)
+                server_objects=$(echo $json_data | awk 'BEGIN{RS="},"}{print $0}' | grep '"Server"')
+                id_list=$(echo $server_objects | awk 'BEGIN{RS=","}{print $0}' | grep '"id"' | sed 's/.*: //;s/}//;s/"//g')
+                for id in $id_list
+                do
+                    echo "Pulling from server with id $id"
+                    curl -s -k -H "Authorization: ${ADMIN_KEY}" -H "Accept: application/json" -H "Content-Type: application/json" https://misp-server/servers/push/$id
+                done
+            envFrom:
+              - secretRef:
+                  name: instance-secrets
+          restartPolicy: Never
+      backoffLimit: 2
+      activeDeadlineSeconds: 1200
+  concurrencyPolicy: Forbid
