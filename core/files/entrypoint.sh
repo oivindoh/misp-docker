@@ -70,19 +70,19 @@ export NGINX_X_FORWARDED_FOR=${NGINX_X_FORWARDED_FOR:-false}
 export NGINX_SET_REAL_IP_FROM=${NGINX_SET_REAL_IP_FROM}
 export NGINX_CLIENT_MAX_BODY_SIZE=${NGINX_CLIENT_MAX_BODY_SIZE:-50M}
 
-if [ -n "$KUBERNETES_SERVICE_HOST" ]; then
+if [ -n "$KUBERNETES_SERVICE_HOST" ] && [ -n "$CONTAINER_NAME" ]; then
+  echo "Running Kubernetes-specific startup"
   case "$CONTAINER_NAME" in
     nginx*)
+      echo " - NGINX"
       exec /entrypoint_k8s_nginx.sh
     ;;
     php*)
+      echo " - PHP"
       # Not ideal, but let supervisord manage the workers still
       mv /etc/supervisor/conf.d/10-supervisor.conf{.k8s,}
       /usr/bin/supervisord -c /etc/supervisor/supervisord.conf &
       exec /entrypoint_k8s_fpm.sh
-    ;;
-    cron*)
-      exec /entrypoint_cron.sh
     ;;
   esac
 else
